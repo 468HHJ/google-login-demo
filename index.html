@@ -5,163 +5,55 @@
   <title>Firebase Google Login - Online Earning</title>
   <style>
     /* Reset and base */
-    * {
-      margin: 0; padding: 0; box-sizing: border-box;
-    }
-    html, body {
-      height: 100%;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      overflow: hidden;
-      background: #0d1117;
-      color: #eee;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { height: 100%; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; overflow: hidden; background: #0d1117; color: #eee; }
 
     /* Canvas fills entire viewport */
-    #bgCanvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 0;
-      background: #0d1117;
-      display: block;
-    }
+    #bgCanvas { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0; background: #0d1117; display: block; }
 
     /* Center container */
     .login-container {
-      position: relative;
-      z-index: 10;
-      min-width: 320px;
-      max-width: 400px;
-      width: 90vw;
-      background: rgba(255 255 255 / 0.1);
-      backdrop-filter: blur(15px);
-      border-radius: 20px;
-      padding: 40px 30px;
-      margin: auto;
-      top: 50%;
-      transform: translateY(-50%);
-      box-shadow: 0 8px 32px rgba(0,0,0,0.7);
-      text-align: center;
-      color: #fff;
+      position: relative; z-index: 10; min-width: 320px; max-width: 400px; width: 90vw;
+      background: rgba(255 255 255 / 0.1); backdrop-filter: blur(15px); border-radius: 20px;
+      padding: 40px 30px; margin: auto; top: 50%; transform: translateY(-50%);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.7); text-align: center; color: #fff;
     }
 
     h1 {
-      font-weight: 700;
-      font-size: 2rem;
-      margin-bottom: 30px;
-      letter-spacing: 1.2px;
-      text-shadow: 0 0 10px #00bfff88;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
+      font-weight: 700; font-size: 2rem; margin-bottom: 30px; letter-spacing: 1.2px;
+      text-shadow: 0 0 10px #00bfff88; display: flex; justify-content: center; align-items: center; gap: 12px;
     }
 
-    /* Dollar coin icon */
-    .earning-icon {
-      width: 32px;
-      height: 32px;
-      filter: drop-shadow(0 0 3px gold);
-      animation: pulse 2.5s infinite ease-in-out;
-    }
-    @keyframes pulse {
-      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 3px gold); }
-      50% { transform: scale(1.1); filter: drop-shadow(0 0 10px gold); }
-    }
+    .earning-icon { width: 32px; height: 32px; filter: drop-shadow(0 0 3px gold); animation: pulse 2.5s infinite ease-in-out; }
+    @keyframes pulse { 0%,100%{transform:scale(1);filter: drop-shadow(0 0 3px gold);} 50%{transform:scale(1.1);filter: drop-shadow(0 0 10px gold);} }
 
     button {
-      width: 100%;
-      padding: 14px 0;
-      border: none;
-      border-radius: 30px;
-      font-size: 1.1rem;
-      font-weight: 600;
-      cursor: pointer;
-      background: linear-gradient(90deg, #4285F4, #34a853);
-      color: white;
-      box-shadow: 0 6px 15px rgba(66, 133, 244, 0.7);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 12px;
+      width: 100%; padding: 14px 0; border: none; border-radius: 30px; font-size: 1.1rem; font-weight: 600;
+      cursor: pointer; background: linear-gradient(90deg, #4285F4, #34a853); color: white;
+      box-shadow: 0 6px 15px rgba(66, 133, 244, 0.7); display: flex; justify-content: center; align-items: center; gap: 12px;
       transition: background 0.3s ease, box-shadow 0.3s ease;
     }
-    button:hover {
-      background: linear-gradient(90deg, #3367D6, #2c8c47);
-      box-shadow: 0 8px 25px rgba(51, 103, 214, 0.9);
-    }
-    button:disabled {
-      background: #555;
-      cursor: not-allowed;
-      box-shadow: none;
-    }
+    button:hover { background: linear-gradient(90deg, #3367D6, #2c8c47); box-shadow: 0 8px 25px rgba(51, 103, 214, 0.9); }
+    button:disabled { background: #555; cursor: not-allowed; box-shadow: none; }
 
-    .btn-icon {
-      width: 24px;
-      height: 24px;
-      filter: drop-shadow(0 0 1px rgba(0,0,0,0.3));
-    }
+    .btn-icon { width: 24px; height: 24px; filter: drop-shadow(0 0 1px rgba(0,0,0,0.3)); }
 
-    #status {
-      margin-top: 25px;
-      font-size: 1rem;
-      min-height: 28px;
-      font-weight: 600;
-      text-shadow: 0 0 6px #00bfff88;
-    }
+    #status { margin-top: 25px; font-size: 1rem; min-height: 28px; font-weight: 600; text-shadow: 0 0 6px #00bfff88; }
+    #profilePic { margin: 25px auto 0 auto; border-radius: 50%; width: 110px; height: 110px; object-fit: cover; box-shadow: 0 0 20px #00bfffaa; display: none; transition: transform 0.3s ease; }
+    #profilePic:hover { transform: scale(1.1); }
 
-    #profilePic {
-      margin: 25px auto 0 auto;
-      border-radius: 50%;
-      width: 110px;
-      height: 110px;
-      object-fit: cover;
-      box-shadow: 0 0 20px #00bfffaa;
-      display: none;
-      transition: transform 0.3s ease;
-    }
-    #profilePic:hover {
-      transform: scale(1.1);
-    }
+    #logoutBtn { margin-top: 30px; background: #555; box-shadow: 0 6px 15px rgba(85, 85, 85, 0.7); }
+    #logoutBtn:hover { background: #333; box-shadow: 0 8px 25px rgba(51, 51, 51, 0.9); }
 
-    #logoutBtn {
-      margin-top: 30px;
-      background: #555;
-      box-shadow: 0 6px 15px rgba(85, 85, 85, 0.7);
-    }
-    #logoutBtn:hover {
-      background: #333;
-      box-shadow: 0 8px 25px rgba(51, 51, 51, 0.9);
-    }
-
-    /* New Start Earning button */
     #startEarningBtn {
-      margin-top: 30px;
-      background: linear-gradient(90deg, #f9d423, #ff4e50);
-      box-shadow: 0 6px 20px rgba(255, 165, 0, 0.8);
-      color: #222;
-      font-weight: 700;
-      font-size: 1.2rem;
-      border-radius: 30px;
-      padding: 14px 0;
-      cursor: pointer;
-      transition: background 0.3s ease, box-shadow 0.3s ease;
-      display: none;
+      margin-top: 30px; background: linear-gradient(90deg, #f9d423, #ff4e50); box-shadow: 0 6px 20px rgba(255, 165, 0, 0.8);
+      color: #222; font-weight: 700; font-size: 1.2rem; border-radius: 30px; padding: 14px 0; cursor: pointer; transition: background 0.3s ease, box-shadow 0.3s ease; display: none;
     }
-    #startEarningBtn:hover {
-      background: linear-gradient(90deg, #ffb347, #ffcc33);
-      box-shadow: 0 8px 30px rgba(255, 215, 0, 1);
-    }
+    #startEarningBtn:hover { background: linear-gradient(90deg, #ffb347, #ffcc33); box-shadow: 0 8px 30px rgba(255, 215, 0, 1); }
 
-    /* Responsive text scaling */
     @media (max-width: 400px) {
-      h1 {
-        font-size: 1.6rem;
-      }
-      button, #startEarningBtn {
-        font-size: 1rem;
-      }
+      h1 { font-size: 1.6rem; }
+      button, #startEarningBtn { font-size: 1rem; }
     }
   </style>
 </head>
@@ -176,6 +68,7 @@
       </svg>
       Online Earning
     </h1>
+
     <button id="loginBtn" aria-label="Login with Google">
       <img class="btn-icon" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" alt="Google logo" />
       Login / Sign Up
@@ -188,12 +81,9 @@
   </div>
 
   <script type="module">
-    // Firebase imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } 
-      from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyA-w2ticJB0R6MhNfEywmhq0yMgds_1_v8",
       authDomain: "myloginapp-d8bd1.firebaseapp.com",
@@ -216,47 +106,49 @@
 
     loginBtn.addEventListener("click", async () => {
       try {
+        statusText.innerText = "Opening Google login...";
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
+        console.log("Google login success:", user);
         statusText.innerText = `Welcome ${user.displayName} (${user.email})`;
-        if(user.photoURL){
-          profilePic.src = user.photoURL;
-          profilePic.style.display = "block";
-        }
+        if(user.photoURL){ profilePic.src = user.photoURL; profilePic.style.display = "block"; }
         loginBtn.style.display = "none";
         logoutBtn.style.display = "block";
         startEarningBtn.style.display = "block";
-      } catch (error) {
+      } catch(error) {
         console.error("Google login error:", error);
-        alert("Google Login failed!");
+        let msg = `Login failed!\nCode: ${error.code}\nMessage: ${error.message}`;
+        if(error.customData?.email) msg += `\nEmail: ${error.customData.email}`;
+        alert(msg);
+        statusText.innerText = "Login failed! Check console for details.";
       }
     });
 
     logoutBtn.addEventListener("click", async () => {
-      await signOut(auth);
-      statusText.innerText = "Logged out";
-      profilePic.style.display = "none";
-      loginBtn.style.display = "flex";
-      logoutBtn.style.display = "none";
-      startEarningBtn.style.display = "none";
+      try {
+        await signOut(auth);
+        statusText.innerText = "Logged out";
+        profilePic.style.display = "none";
+        loginBtn.style.display = "flex";
+        logoutBtn.style.display = "none";
+        startEarningBtn.style.display = "none";
+      } catch(err) { console.error("Logout error:", err); alert("Logout failed! Check console."); }
     });
 
     startEarningBtn.addEventListener("click", () => {
-      // Replace this with your actual earning page or logic
       alert("Welcome to your Online Earning dashboard! 🚀");
     });
 
     auth.onAuthStateChanged(user => {
       if(user){
+        console.log("User signed in:", user);
         statusText.innerText = `Welcome ${user.displayName} (${user.email})`;
-        if(user.photoURL){
-          profilePic.src = user.photoURL;
-          profilePic.style.display = "block";
-        }
+        if(user.photoURL){ profilePic.src = user.photoURL; profilePic.style.display = "block"; }
         loginBtn.style.display = "none";
         logoutBtn.style.display = "block";
         startEarningBtn.style.display = "block";
       } else {
+        console.log("No user signed in.");
         statusText.innerText = "Not logged in";
         profilePic.style.display = "none";
         loginBtn.style.display = "flex";
@@ -265,84 +157,22 @@
       }
     });
 
-    // Canvas background animation (simple moving particles)
+    // Canvas background animation
     const canvas = document.getElementById('bgCanvas');
     const ctx = canvas.getContext('2d');
-    let width, height;
-    let particles = [];
-
-    function resize() {
-      width = window.innerWidth;
-      height = window.innerHeight;
-      canvas.width = width;
-      canvas.height = height;
-    }
-    window.addEventListener('resize', resize);
-    resize();
+    let width, height, particles = [];
+    function resize(){ width=window.innerWidth; height=window.innerHeight; canvas.width=width; canvas.height=height; }
+    window.addEventListener('resize', resize); resize();
 
     class Particle {
-      constructor() {
-        this.x = Math.random() * width;
-        this.y = Math.random() * height;
-        this.radius = Math.random() * 2 + 1;
-        this.speedX = (Math.random() - 0.5) * 0.5;
-        this.speedY = (Math.random() - 0.5) * 0.5;
-        this.color = `rgba(255, 215, 0, ${Math.random() * 0.5 + 0.3})`; // golden color
-      }
-      update() {
-        this.x += this.speedX;
-        this.y += this.speedY;
-
-        if(this.x < 0 || this.x > width) this.speedX *= -1;
-        if(this.y < 0 || this.y > height) this.speedY *= -1;
-      }
-      draw() {
-        ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
-        ctx.fillStyle = this.color;
-        ctx.shadowColor = this.color;
-        ctx.shadowBlur = 8;
-        ctx.fill();
-      }
+      constructor(){ this.x=Math.random()*width; this.y=Math.random()*height; this.radius=Math.random()*2+1; this.speedX=(Math.random()-0.5)*0.5; this.speedY=(Math.random()-0.5)*0.5; this.color=`rgba(255,215,0,${Math.random()*0.5+0.3})`; }
+      update(){ this.x+=this.speedX; this.y+=this.speedY; if(this.x<0||this.x>width)this.speedX*=-1; if(this.y<0||this.y>height)this.speedY*=-1; }
+      draw(){ ctx.beginPath(); ctx.arc(this.x,this.y,this.radius,0,Math.PI*2); ctx.fillStyle=this.color; ctx.shadowColor=this.color; ctx.shadowBlur=8; ctx.fill(); }
     }
-
-    function initParticles(count = 120) {
-      particles = [];
-      for(let i=0; i<count; i++){
-        particles.push(new Particle());
-      }
-    }
-
-    function connectParticles() {
-      for(let a=0; a<particles.length; a++){
-        for(let b=a+1; b<particles.length; b++){
-          let dx = particles[a].x - particles[b].x;
-          let dy = particles[a].y - particles[b].y;
-          let dist = Math.sqrt(dx*dx + dy*dy);
-          if(dist < 120){
-            ctx.beginPath();
-            ctx.strokeStyle = `rgba(255,215,0,${1 - dist/120})`;
-            ctx.lineWidth = 1;
-            ctx.moveTo(particles[a].x, particles[a].y);
-            ctx.lineTo(particles[b].x, particles[b].y);
-            ctx.stroke();
-          }
-        }
-      }
-    }
-
-    function animate() {
-      ctx.clearRect(0, 0, width, height);
-      particles.forEach(p => {
-        p.update();
-        p.draw();
-      });
-      connectParticles();
-      requestAnimationFrame(animate);
-    }
-
-    initParticles(120);
-    animate();
+    function initParticles(count=120){ particles=[]; for(let i=0;i<count;i++)particles.push(new Particle()); }
+    function connectParticles(){ for(let a=0;a<particles.length;a++){ for(let b=a+1;b<particles.length;b++){ let dx=particles[a].x-particles[b].x; let dy=particles[a].y-particles[b].y; let dist=Math.sqrt(dx*dx+dy*dy); if(dist<120){ ctx.beginPath(); ctx.strokeStyle=`rgba(255,215,0,${1-dist/120})`; ctx.lineWidth=1; ctx.moveTo(particles[a].x,particles[a].y); ctx.lineTo(particles[b].x,particles[b].y); ctx.stroke(); } } } }
+    function animate(){ ctx.clearRect(0,0,width,height); particles.forEach(p=>{p.update();p.draw();}); connectParticles(); requestAnimationFrame(animate); }
+    initParticles(120); animate();
   </script>
 </body>
 </html>
