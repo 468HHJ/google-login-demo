@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Google Login Demo</title>
+  <title>Firebase Login Demo</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -11,16 +11,18 @@
       margin: 0;
       padding: 0;
     }
-    h2 {
-      margin-top: 50px;
+    h2, h3 {
+      margin-top: 30px;
       color: #333;
     }
-    button {
+    input, button {
       margin: 10px;
-      padding: 12px 20px;
+      padding: 10px 15px;
+      font-size: 16px;
+    }
+    button {
       border: none;
       border-radius: 8px;
-      font-size: 16px;
       cursor: pointer;
       background: #4285F4;
       color: white;
@@ -29,9 +31,9 @@
     button:hover {
       background: #3367D6;
     }
-    #status {
-      margin-top: 20px;
-      font-size: 18px;
+    #status, #phoneStatus {
+      margin-top: 15px;
+      font-size: 16px;
       color: #444;
     }
     #profilePic {
@@ -44,19 +46,26 @@
 </head>
 <body>
   <h2>Firebase Google Login</h2>
-
   <button id="loginBtn">Login with Google</button>
-  <button id="logoutBtn">Logout</button>
+
+  <h3>Firebase Phone Login</h3>
+  <input type="text" id="phoneNumber" placeholder="+91XXXXXXXXXX">
+  <button id="sendCode">Send OTP</button><br>
+  <input type="text" id="otp" placeholder="Enter OTP">
+  <button id="verifyCode">Verify OTP</button>
+
   <p id="status">Not logged in</p>
-  <img id="profilePic" src="" alt="" style="display:none;">
+  <p id="phoneStatus"></p>
+  <img id="profilePic" src="" alt="" style="display:none;"><br>
+  <button id="logoutBtn">Logout</button>
 
   <script type="module">
-    // Firebase SDKs import
+    // Firebase SDKs
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } 
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, RecaptchaVerifier, signInWithPhoneNumber } 
       from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
-    // Tumhara Firebase config
+    // Firebase config
     const firebaseConfig = {
       apiKey: "AIzaSyA-w2ticJB0R6MhNfEywmhq0yMgds_1_v8",
       authDomain: "myloginapp-d8bd1.firebaseapp.com",
@@ -67,12 +76,11 @@
       measurementId: "G-MS0FQCQR7M"
     };
 
-    // Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    // Login
+    // --- Google Login ---
     document.getElementById("loginBtn").addEventListener("click", async () => {
       try {
         const result = await signInWithPopup(auth, provider);
@@ -85,15 +93,48 @@
           img.style.display = "block";
         }
       } catch (error) {
-        console.error("Login error:", error);
-        alert("Login failed! Check console for details.");
+        console.error("Google login error:", error);
+        alert("Google Login failed!");
       }
     });
 
-    // Logout
+    // --- Phone Login ---
+    window.recaptchaVerifier = new RecaptchaVerifier('sendCode', { 'size': 'invisible' }, auth);
+    recaptchaVerifier.render();
+
+    document.getElementById('sendCode').addEventListener('click', () => {
+      const phoneNumber = document.getElementById('phoneNumber').value;
+      const appVerifier = window.recaptchaVerifier;
+
+      signInWithPhoneNumber(auth, phoneNumber, appVerifier)
+        .then(confirmationResult => {
+          window.confirmationResult = confirmationResult;
+          document.getElementById('phoneStatus').innerText = 'OTP sent!';
+        })
+        .catch(error => {
+          console.error(error);
+          alert('Error sending OTP');
+        });
+    });
+
+    document.getElementById('verifyCode').addEventListener('click', () => {
+      const code = document.getElementById('otp').value;
+      window.confirmationResult.confirm(code)
+        .then(result => {
+          const user = result.user;
+          document.getElementById('phoneStatus').innerText = `Phone login successful: ${user.phoneNumber}`;
+        })
+        .catch(error => {
+          console.error(error);
+          alert('Invalid OTP');
+        });
+    });
+
+    // --- Logout ---
     document.getElementById("logoutBtn").addEventListener("click", async () => {
       await signOut(auth);
       document.getElementById("status").innerText = "Logged out";
+      document.getElementById("phoneStatus").innerText = "";
       document.getElementById("profilePic").style.display = "none";
     });
   </script>
