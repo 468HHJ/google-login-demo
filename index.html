@@ -1,68 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Firebase Login Demo</title>
+  <meta charset="UTF-8" />
+  <title>Firebase Google Login - Online Earning</title>
   <style>
-    body {
-      font-family: Arial, sans-serif;
+    /* Reset and base */
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+    }
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden;
+      background: #0d1117;
+      color: #eee;
+    }
+
+    /* Canvas fills entire viewport */
+    #bgCanvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 0;
+      background: #0d1117;
+      display: block;
+    }
+
+    /* Center container */
+    .login-container {
+      position: relative;
+      z-index: 10;
+      min-width: 320px;
+      max-width: 400px;
+      width: 90vw;
+      background: rgba(255 255 255 / 0.1);
+      backdrop-filter: blur(15px);
+      border-radius: 20px;
+      padding: 40px 30px;
+      margin: auto;
+      top: 50%;
+      transform: translateY(-50%);
+      box-shadow: 0 8px 32px rgba(0,0,0,0.7);
       text-align: center;
-      background: #f2f2f2;
-      margin: 0;
-      padding: 0;
+      color: #fff;
     }
-    h2, h3 {
-      margin-top: 30px;
-      color: #333;
+
+    h1 {
+      font-weight: 700;
+      font-size: 2rem;
+      margin-bottom: 30px;
+      letter-spacing: 1.2px;
+      text-shadow: 0 0 10px #00bfff88;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
     }
-    input, button {
-      margin: 10px;
-      padding: 10px 15px;
-      font-size: 16px;
+
+    /* Dollar coin icon */
+    .earning-icon {
+      width: 32px;
+      height: 32px;
+      filter: drop-shadow(0 0 3px gold);
+      animation: pulse 2.5s infinite ease-in-out;
     }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); filter: drop-shadow(0 0 3px gold); }
+      50% { transform: scale(1.1); filter: drop-shadow(0 0 10px gold); }
+    }
+
     button {
+      width: 100%;
+      padding: 14px 0;
       border: none;
-      border-radius: 8px;
+      border-radius: 30px;
+      font-size: 1.1rem;
+      font-weight: 600;
       cursor: pointer;
-      background: #4285F4;
+      background: linear-gradient(90deg, #4285F4, #34a853);
       color: white;
-      transition: 0.3s;
+      box-shadow: 0 6px 15px rgba(66, 133, 244, 0.7);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 12px;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
     }
     button:hover {
-      background: #3367D6;
+      background: linear-gradient(90deg, #3367D6, #2c8c47);
+      box-shadow: 0 8px 25px rgba(51, 103, 214, 0.9);
     }
-    #status, #phoneStatus {
-      margin-top: 15px;
-      font-size: 16px;
-      color: #444;
+    button:disabled {
+      background: #555;
+      cursor: not-allowed;
+      box-shadow: none;
     }
+
+    .btn-icon {
+      width: 24px;
+      height: 24px;
+      filter: drop-shadow(0 0 1px rgba(0,0,0,0.3));
+    }
+
+    #status {
+      margin-top: 25px;
+      font-size: 1rem;
+      min-height: 28px;
+      font-weight: 600;
+      text-shadow: 0 0 6px #00bfff88;
+    }
+
     #profilePic {
-      margin-top: 10px;
+      margin: 25px auto 0 auto;
       border-radius: 50%;
-      width: 100px;
-      height: 100px;
+      width: 110px;
+      height: 110px;
+      object-fit: cover;
+      box-shadow: 0 0 20px #00bfffaa;
+      display: none;
+      transition: transform 0.3s ease;
+    }
+    #profilePic:hover {
+      transform: scale(1.1);
+    }
+
+    #logoutBtn {
+      margin-top: 30px;
+      background: #555;
+      box-shadow: 0 6px 15px rgba(85, 85, 85, 0.7);
+    }
+    #logoutBtn:hover {
+      background: #333;
+      box-shadow: 0 8px 25px rgba(51, 51, 51, 0.9);
+    }
+
+    /* New Start Earning button */
+    #startEarningBtn {
+      margin-top: 30px;
+      background: linear-gradient(90deg, #f9d423, #ff4e50);
+      box-shadow: 0 6px 20px rgba(255, 165, 0, 0.8);
+      color: #222;
+      font-weight: 700;
+      font-size: 1.2rem;
+      border-radius: 30px;
+      padding: 14px 0;
+      cursor: pointer;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
+      display: none;
+    }
+    #startEarningBtn:hover {
+      background: linear-gradient(90deg, #ffb347, #ffcc33);
+      box-shadow: 0 8px 30px rgba(255, 215, 0, 1);
+    }
+
+    /* Responsive text scaling */
+    @media (max-width: 400px) {
+      h1 {
+        font-size: 1.6rem;
+      }
+      button, #startEarningBtn {
+        font-size: 1rem;
+      }
     }
   </style>
 </head>
 <body>
-  <h2>Firebase Google Login</h2>
-  <button id="loginBtn">Login with Google</button>
+  <canvas id="bgCanvas"></canvas>
 
-  <h3>Firebase Phone Login</h3>
-  <input type="text" id="phoneNumber" placeholder="+91XXXXXXXXXX">
-  <button id="sendCode">Send OTP</button><br>
-  <input type="text" id="otp" placeholder="Enter OTP">
-  <button id="verifyCode">Verify OTP</button>
+  <div class="login-container" role="main" aria-label="Google login form">
+    <h1>
+      <svg class="earning-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="gold" aria-hidden="true" focusable="false">
+        <circle cx="32" cy="32" r="30" stroke="goldenrod" stroke-width="3" fill="gold" />
+        <text x="32" y="42" font-size="28" font-weight="bold" fill="darkorange" text-anchor="middle" font-family="Arial, sans-serif">$</text>
+      </svg>
+      Online Earning
+    </h1>
+    <button id="loginBtn" aria-label="Login with Google">
+      <img class="btn-icon" src="https://upload.wikimedia.org/wikipedia/commons/thumb/5/53/Google_%22G%22_Logo.svg/512px-Google_%22G%22_Logo.svg.png" alt="Google logo" />
+      Login / Sign Up
+    </button>
 
-  <p id="status">Not logged in</p>
-  <p id="phoneStatus"></p>
-  <img id="profilePic" src="" alt="" style="display:none;"><br>
-  <button id="logoutBtn">Logout</button>
+    <p id="status">Not logged in</p>
+    <img id="profilePic" src="" alt="Profile Picture" />
+    <button id="startEarningBtn" aria-label="Start earning online">Start Earning 💰</button>
+    <button id="logoutBtn" style="display:none;">Logout</button>
+  </div>
 
   <script type="module">
-    // Firebase SDKs
+    // Firebase imports
     import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.1/firebase-app.js";
-    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, RecaptchaVerifier, signInWithPhoneNumber } 
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut } 
       from "https://www.gstatic.com/firebasejs/11.0.1/firebase-auth.js";
 
     // Firebase config
@@ -80,63 +208,141 @@
     const auth = getAuth(app);
     const provider = new GoogleAuthProvider();
 
-    // --- Google Login ---
-    document.getElementById("loginBtn").addEventListener("click", async () => {
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const statusText = document.getElementById("status");
+    const profilePic = document.getElementById("profilePic");
+    const startEarningBtn = document.getElementById("startEarningBtn");
+
+    loginBtn.addEventListener("click", async () => {
       try {
         const result = await signInWithPopup(auth, provider);
         const user = result.user;
-        document.getElementById("status").innerText =
-          `Welcome ${user.displayName} (${user.email})`;
+        statusText.innerText = `Welcome ${user.displayName} (${user.email})`;
         if(user.photoURL){
-          const img = document.getElementById("profilePic");
-          img.src = user.photoURL;
-          img.style.display = "block";
+          profilePic.src = user.photoURL;
+          profilePic.style.display = "block";
         }
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "block";
+        startEarningBtn.style.display = "block";
       } catch (error) {
         console.error("Google login error:", error);
         alert("Google Login failed!");
       }
     });
 
-    // --- Phone Login ---
-    window.recaptchaVerifier = new RecaptchaVerifier('sendCode', { 'size': 'invisible' }, auth);
-    recaptchaVerifier.render();
-
-    document.getElementById('sendCode').addEventListener('click', () => {
-      const phoneNumber = document.getElementById('phoneNumber').value;
-      const appVerifier = window.recaptchaVerifier;
-
-      signInWithPhoneNumber(auth, phoneNumber, appVerifier)
-        .then(confirmationResult => {
-          window.confirmationResult = confirmationResult;
-          document.getElementById('phoneStatus').innerText = 'OTP sent!';
-        })
-        .catch(error => {
-          console.error(error);
-          alert('Error sending OTP');
-        });
-    });
-
-    document.getElementById('verifyCode').addEventListener('click', () => {
-      const code = document.getElementById('otp').value;
-      window.confirmationResult.confirm(code)
-        .then(result => {
-          const user = result.user;
-          document.getElementById('phoneStatus').innerText = `Phone login successful: ${user.phoneNumber}`;
-        })
-        .catch(error => {
-          console.error(error);
-          alert('Invalid OTP');
-        });
-    });
-
-    // --- Logout ---
-    document.getElementById("logoutBtn").addEventListener("click", async () => {
+    logoutBtn.addEventListener("click", async () => {
       await signOut(auth);
-      document.getElementById("status").innerText = "Logged out";
-      document.getElementById("phoneStatus").innerText = "";
-      document.getElementById("profilePic").style.display = "none";
+      statusText.innerText = "Logged out";
+      profilePic.style.display = "none";
+      loginBtn.style.display = "flex";
+      logoutBtn.style.display = "none";
+      startEarningBtn.style.display = "none";
     });
+
+    startEarningBtn.addEventListener("click", () => {
+      // Replace this with your actual earning page or logic
+      alert("Welcome to your Online Earning dashboard! 🚀");
+    });
+
+    auth.onAuthStateChanged(user => {
+      if(user){
+        statusText.innerText = `Welcome ${user.displayName} (${user.email})`;
+        if(user.photoURL){
+          profilePic.src = user.photoURL;
+          profilePic.style.display = "block";
+        }
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "block";
+        startEarningBtn.style.display = "block";
+      } else {
+        statusText.innerText = "Not logged in";
+        profilePic.style.display = "none";
+        loginBtn.style.display = "flex";
+        logoutBtn.style.display = "none";
+        startEarningBtn.style.display = "none";
+      }
+    });
+
+    // Canvas background animation (simple moving particles)
+    const canvas = document.getElementById('bgCanvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+    let particles = [];
+
+    function resize() {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    class Particle {
+      constructor() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
+        this.radius = Math.random() * 2 + 1;
+        this.speedX = (Math.random() - 0.5) * 0.5;
+        this.speedY = (Math.random() - 0.5) * 0.5;
+        this.color = `rgba(255, 215, 0, ${Math.random() * 0.5 + 0.3})`; // golden color
+      }
+      update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+
+        if(this.x < 0 || this.x > width) this.speedX *= -1;
+        if(this.y < 0 || this.y > height) this.speedY *= -1;
+      }
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+        ctx.fillStyle = this.color;
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 8;
+        ctx.fill();
+      }
+    }
+
+    function initParticles(count = 120) {
+      particles = [];
+      for(let i=0; i<count; i++){
+        particles.push(new Particle());
+      }
+    }
+
+    function connectParticles() {
+      for(let a=0; a<particles.length; a++){
+        for(let b=a+1; b<particles.length; b++){
+          let dx = particles[a].x - particles[b].x;
+          let dy = particles[a].y - particles[b].y;
+          let dist = Math.sqrt(dx*dx + dy*dy);
+          if(dist < 120){
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(255,215,0,${1 - dist/120})`;
+            ctx.lineWidth = 1;
+            ctx.moveTo(particles[a].x, particles[a].y);
+            ctx.lineTo(particles[b].x, particles[b].y);
+            ctx.stroke();
+          }
+        }
+      }
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      connectParticles();
+      requestAnimationFrame(animate);
+    }
+
+    initParticles(120);
+    animate();
   </script>
 </body>
 </html>
